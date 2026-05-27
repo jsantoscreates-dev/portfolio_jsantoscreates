@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Personal Expense Tracker — Jorge Santos</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="page page--case">
+    <header class="sidebar">
+      <a class="sidebar__back link-nav" href="index.html">
+        <svg class="sidebar__back-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+          <path d="M17 12H7M11 8L7 12L11 16" stroke="currentColor" stroke-linecap="square" stroke-linejoin="round" />
+        </svg>
+        <span>All projects</span>
+      </a>
+
+      <hr class="sidebar__divider" />
+
+      <nav class="sidebar__nav" aria-label="Social and contact">
+        <ul>
+          <li><a class="link-nav" href="https://instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram (opens in new tab)">Instagram</a></li>
+          <li><a class="link-nav" href="https://linkedin.com/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn (opens in new tab)">LinkedIn</a></li>
+          <li><a class="link-nav" href="#">Resume</a></li>
+          <li><a class="link-nav" href="mailto:jsantoscreates@gmail.com">Email</a></li>
+        </ul>
+      </nav>
+
+      <hr class="sidebar__divider" />
+
+      <footer class="sidebar__copyright">
+        <p>&copy; 2026 All rights reserved.</p>
+      </footer>
+    </header>
+
+    <main class="content content--case" id="main-content" aria-label="Case study">
+      <article class="case">
+        <header class="case-hero">
+          <figure class="case-hero__media">
+            <video
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              aria-label="Personal Expense Tracker app preview"
+            >
+              <source media="(max-width: 767px)" src="Personal%20Expense%20Tracker/mobile/Main.mobile.mp4" type="video/mp4" />
+              <source src="Personal%20Expense%20Tracker/Desktop/Main.mp4" type="video/mp4" />
+            </video>
+          </figure>
+
+          <div class="case-hero__details">
+            <h1 class="case-title">Personal Expense Tracker</h1>
+
+            <div class="case-hero__info">
+              <p class="case-tools">UX/UI Design, User Research, Interaction Design, Information Architecture, Data Visualization, Responsive Design, Figma, Claude Code, Cursor</p>
+
+              <div class="case-intro">
+                <p class="case-label">Intro</p>
+                <div class="case-intro__body">
+                  <p>What if you could get monthly expense reports in just one click?</p>
+                  <p>I replaced the manual Notion-to-Excel workflow with a single tool. Three-tap expense logging. A live category dashboard. Monthly history with search. One-click Excel export.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <hr class="case-divider" />
+
+        <section class="case-section" aria-labelledby="case-context">
+          <div class="case-section__text">
+            <p class="case-label" id="case-context">Context</p>
+            <div class="case-section__columns">
+              <h2 class="case-heading">Fragmented workflow with<br />no real-time spending visibility</h2>
+              <div class="case-body">
+                <p>I was tracking my spending daily in Notion and analyzing it monthly in Excel. Every month, I had to take time aside to calculate and extract my spending per category, copying it from Notion into an Excel file.</p>
+                <p>The workflow was fragmented. Daily logging in Notion. Monthly analysis in Excel. Manual filtering and copy/paste, every single month. Zero real-time visibility, no spending insights.</p>
+              </div>
+            </div>
+          </div>
+          <figure class="case-section__media">
+            <picture>
+              <source media="(max-width: 767px)" srcset="Personal%20Expense%20Tracker/mobile/Context-mobile.png" />
+              <img src="Personal%20Expense%20Tracker/Desktop/Context.png" alt="Context" />
+            </picture>
+          </figure>
+        </section>
+
+        <hr class="case-divider" />
+
+        <section class="case-section" aria-labelledby="case-problem">
+          <div class="case-section__text">
+            <p class="case-label" id="case-problem">Problem</p>
+            <div class="case-section__columns">
+              <h2 class="case-heading">Manual monthly category tracking with no real-time visibility</h2>
+              <div class="case-body">
+                <p>Every month, I had to copy everything by hand just to understand spending by category. Hours lost. No real-time visibility. No way to spot spending habits.</p>
+                <p>A better solution needed to combine fast logging, live category visibility, quick export, and easy monthly history.</p>
+              </div>
+            </div>
+          </div>
+          <figure class="case-section__media">
+            <picture>
+              <source media="(max-width: 767px)" srcset="Personal%20Expense%20Tracker/mobile/Problem-mobile.png" />
+              <img src="Personal%20Expense%20Tracker/Desktop/Problem.png" alt="Problem" />
+            </picture>
+          </figure>
+        </section>
+
+        <hr class="case-divider" />
+
+        <section class="case-section" aria-labelledby="case-solution">
+          <div class="case-section__text">
+            <p class="case-label" id="case-solution">Solution</p>
+            <div class="case-section__columns">
+              <h2 class="case-heading">One expense tracker for logging, insights, and monthly review</h2>
+              <div class="case-body">
+                <p>A simple expense tracker that replaces the manual Notion-to-Excel workflow with a faster, more connected experience.</p>
+                <p>The result: a clear view of spending without the monthly copy-paste work.</p>
+              </div>
+            </div>
+          </div>
+          <figure class="case-section__media">
+            <video autoplay muted loop playsinline preload="metadata" aria-label="Solution">
+              <source media="(max-width: 767px)" src="Personal%20Expense%20Tracker/mobile/Solution-mobile.mp4" type="video/mp4" />
+              <source src="Personal%20Expense%20Tracker/Desktop/Solution.mp4" type="video/mp4" />
+            </video>
+          </figure>
+        </section>
+      </article>
+    </main>
+  </div>
+  <script src="main.js"></script>
+</body>
+</html>
