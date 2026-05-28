@@ -33,10 +33,9 @@
   }
 
   function initProjectVideos() {
-    var videos = document.querySelectorAll(
-      ".project-card__media video, .case-hero__media video, .case-section__media video"
-    );
-    if (!videos.length) return;
+    var homeVideos = document.querySelectorAll(".project-card__media video");
+    var caseVideos = document.querySelectorAll(".case-hero__media video, .case-section__media video");
+    if (!homeVideos.length && !caseVideos.length) return;
 
     applyVideoSources();
 
@@ -58,18 +57,63 @@
 
     function playVideos() {
       if (reduceMotion) {
-        videos.forEach(function (video) {
+        homeVideos.forEach(function (video) {
+          video.pause();
+          video.removeAttribute("autoplay");
+        });
+        caseVideos.forEach(function (video) {
           video.pause();
           video.removeAttribute("autoplay");
         });
         return;
       }
 
-      videos.forEach(function (video) {
+      // Case study: tocar logo (só 1-2 vídeos)
+      caseVideos.forEach(function (video) {
         prepareVideo(video);
         video.play().catch(function () {
           /* autoplay bloqueado — o poster fica visível */
         });
+      });
+    }
+
+    function initHomeLazyPlayback() {
+      if (!homeVideos.length) return;
+
+      // Pausa tudo de início para evitar 4 vídeos a competir no load.
+      homeVideos.forEach(function (video) {
+        prepareVideo(video);
+        try {
+          video.pause();
+        } catch (e) {}
+      });
+
+      // Fallback simples se não houver IntersectionObserver
+      if (!("IntersectionObserver" in window)) {
+        homeVideos.forEach(function (video) {
+          video.play().catch(function () {});
+        });
+        return;
+      }
+
+      var io = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            var video = entry.target;
+            if (entry.isIntersecting) {
+              video.play().catch(function () {});
+            } else {
+              try {
+                video.pause();
+              } catch (e) {}
+            }
+          });
+        },
+        { root: null, rootMargin: "200px 0px", threshold: 0.01 }
+      );
+
+      homeVideos.forEach(function (video) {
+        io.observe(video);
       });
     }
 
@@ -79,6 +123,10 @@
 
       function onFirstGesture() {
         playVideos();
+        // Gesto do utilizador também ajuda a arrancar os vídeos da home
+        homeVideos.forEach(function (video) {
+          video.play().catch(function () {});
+        });
       }
 
       window.addEventListener("click", onFirstGesture, { passive: true, once: true });
@@ -88,6 +136,7 @@
     }
 
     playVideos();
+    initHomeLazyPlayback();
     armGestureReplay();
 
     mq.addEventListener("change", function () {
