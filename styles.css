@@ -323,11 +323,11 @@ ul {
 }
 
 /* ============================================
-   Large desktop (≥ 1600px)
-   Mantém o feel, mas reduz a altura do media
-   para os títulos ficarem visíveis above-the-fold.
+   Large desktop (≥ 1440px)
+   Em alguns modos "scaled" do macOS, 1920×1080
+   pode resultar num viewport CSS < 1600px.
    ============================================ */
-@media (min-width: 1600px) {
+@media (min-width: 1440px) {
   .project-card__media {
     aspect-ratio: 16 / 9;
   }
