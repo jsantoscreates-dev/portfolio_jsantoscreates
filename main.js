@@ -56,9 +56,7 @@
       video.setAttribute("autoplay", "");
 
       return video.play().catch(function () {
-        // Se continuar bloqueado (política do browser), dá ao utilizador um controlo
-        // explícito para iniciar o vídeo.
-        video.controls = true;
+        // autoplay bloqueado pelo browser (ex.: Brave policy)
       });
     }
 
@@ -67,7 +65,6 @@
         videos.forEach(function (video) {
           video.pause();
           video.removeAttribute("autoplay");
-          video.controls = true;
         });
         return;
       }
