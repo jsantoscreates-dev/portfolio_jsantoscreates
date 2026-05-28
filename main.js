@@ -44,47 +44,25 @@
     var mq = window.matchMedia("(max-width: 767px)");
     var gestureArmed = false;
 
-    function tryPlay(video) {
-      // Brave/Chromium pode bloquear autoplay se estas flags não estiverem setadas
-      // como propriedades (mesmo que existam como atributos no HTML).
-      video.muted = true;
-      video.defaultMuted = true;
-      video.playsInline = true;
-      video.autoplay = true;
-      video.setAttribute("muted", "");
-      video.setAttribute("playsinline", "");
-      video.setAttribute("autoplay", "");
-
-      return video.play().catch(function () {
-        // Se continuar bloqueado (política do browser), dá ao utilizador um controlo
-        // explícito para iniciar o vídeo.
-        video.controls = true;
-      });
-    }
-
     function playVideos() {
       if (reduceMotion) {
         videos.forEach(function (video) {
           video.pause();
           video.removeAttribute("autoplay");
-          video.controls = true;
         });
         return;
       }
 
       videos.forEach(function (video) {
-        // Tenta tocar já; se ainda não estiver pronto, tenta novamente quando carregar.
-        if (video.readyState < 2) {
-          var onReady = function () {
-            tryPlay(video);
-            video.removeEventListener("loadeddata", onReady);
-            video.removeEventListener("canplay", onReady);
-          };
-          video.addEventListener("loadeddata", onReady);
-          video.addEventListener("canplay", onReady);
-        }
+        // Brave/Chromium pode bloquear autoplay se estas flags não estiverem setadas
+        // como propriedades (mesmo que existam como atributos no HTML).
+        video.muted = true;
+        video.defaultMuted = true;
+        video.playsInline = true;
 
-        tryPlay(video);
+        video.play().catch(function () {
+          /* autoplay bloqueado — o poster fica visível */
+        });
       });
     }
 
