@@ -42,6 +42,19 @@
 
     var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var mq = window.matchMedia("(max-width: 767px)");
+    var gestureArmed = false;
+
+    function prepareVideo(video) {
+      // Alguns browsers (ex.: Brave/Chromium) exigem estas flags como propriedades
+      // para permitir autoplay (mesmo que existam como atributos no HTML).
+      video.muted = true;
+      video.defaultMuted = true;
+      video.playsInline = true;
+      video.autoplay = true;
+      video.setAttribute("muted", "");
+      video.setAttribute("playsinline", "");
+      video.setAttribute("autoplay", "");
+    }
 
     function playVideos() {
       if (reduceMotion) {
@@ -53,17 +66,37 @@
       }
 
       videos.forEach(function (video) {
+        prepareVideo(video);
         video.play().catch(function () {
           /* autoplay bloqueado — o poster fica visível */
         });
       });
     }
 
+    function armGestureReplay() {
+      if (gestureArmed) return;
+      gestureArmed = true;
+
+      function onFirstGesture() {
+        playVideos();
+      }
+
+      window.addEventListener("click", onFirstGesture, { passive: true, once: true });
+      window.addEventListener("touchstart", onFirstGesture, { passive: true, once: true });
+      window.addEventListener("keydown", onFirstGesture, { once: true });
+      window.addEventListener("scroll", onFirstGesture, { passive: true, once: true });
+    }
+
     playVideos();
+    armGestureReplay();
 
     mq.addEventListener("change", function () {
       applyVideoSources();
       playVideos();
+    });
+
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) playVideos();
     });
   }
 
