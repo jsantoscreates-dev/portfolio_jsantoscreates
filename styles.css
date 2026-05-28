@@ -323,6 +323,17 @@ ul {
 }
 
 /* ============================================
+   Large desktop (≥ 1600px)
+   Mantém o feel, mas reduz a altura do media
+   para os títulos ficarem visíveis above-the-fold.
+   ============================================ */
+@media (min-width: 1600px) {
+  .project-card__media {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+/* ============================================
    Desktop 1200 — 1439
    Mantém duas colunas; ajustes ligeiros para
    corresponder ao frame de 1200.
