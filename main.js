@@ -42,7 +42,6 @@
 
     var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var mq = window.matchMedia("(max-width: 767px)");
-    var gestureArmed = false;
 
     function playVideos() {
       if (reduceMotion) {
@@ -54,38 +53,13 @@
       }
 
       videos.forEach(function (video) {
-        // Brave/Chromium pode bloquear autoplay se estas flags não estiverem setadas
-        // como propriedades (mesmo que existam como atributos no HTML).
-        video.muted = true;
-        video.defaultMuted = true;
-        video.playsInline = true;
-
         video.play().catch(function () {
           /* autoplay bloqueado — o poster fica visível */
         });
       });
     }
 
-    function armGestureReplay() {
-      if (gestureArmed) return;
-      gestureArmed = true;
-
-      function onFirstGesture() {
-        playVideos();
-        window.removeEventListener("click", onFirstGesture, { passive: true });
-        window.removeEventListener("touchstart", onFirstGesture, { passive: true });
-        window.removeEventListener("keydown", onFirstGesture);
-        window.removeEventListener("scroll", onFirstGesture, { passive: true });
-      }
-
-      window.addEventListener("click", onFirstGesture, { passive: true, once: true });
-      window.addEventListener("touchstart", onFirstGesture, { passive: true, once: true });
-      window.addEventListener("keydown", onFirstGesture, { once: true });
-      window.addEventListener("scroll", onFirstGesture, { passive: true, once: true });
-    }
-
     playVideos();
-    armGestureReplay();
 
     mq.addEventListener("change", function () {
       applyVideoSources();
