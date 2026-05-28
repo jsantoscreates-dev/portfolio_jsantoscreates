@@ -281,7 +281,7 @@ ul {
 .project-card__media {
   width: 100%;
   aspect-ratio: 3 / 2;
-  background-color: #f5f5f5;
+  background-color: #151515;
   overflow: hidden;
   border-radius: 0;
 }
