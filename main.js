@@ -77,22 +77,34 @@
       });
     }
 
+    function playHomeVideo(video) {
+      prepareVideo(video);
+      video.play().catch(function () {});
+    }
+
     function initHomeLazyPlayback() {
       if (!homeVideos.length) return;
 
-      // Pausa tudo de início para evitar 4 vídeos a competir no load.
-      homeVideos.forEach(function (video) {
-        prepareVideo(video);
+      var firstVideo = homeVideos[0];
+
+      // 1º vídeo: play logo ao abrir (não esperar animação nem scroll)
+      playHomeVideo(firstVideo);
+
+      // Restantes: lazy-play para não competir com o primeiro no load
+      for (var i = 1; i < homeVideos.length; i++) {
         try {
-          video.pause();
+          homeVideos[i].pause();
         } catch (e) {}
-      });
+        prepareVideo(homeVideos[i]);
+      }
+
+      if (homeVideos.length === 1) return;
 
       // Fallback simples se não houver IntersectionObserver
       if (!("IntersectionObserver" in window)) {
-        homeVideos.forEach(function (video) {
-          video.play().catch(function () {});
-        });
+        for (var j = 1; j < homeVideos.length; j++) {
+          playHomeVideo(homeVideos[j]);
+        }
         return;
       }
 
@@ -100,8 +112,10 @@
         function (entries) {
           entries.forEach(function (entry) {
             var video = entry.target;
+            if (video === firstVideo) return;
+
             if (entry.isIntersecting) {
-              video.play().catch(function () {});
+              playHomeVideo(video);
             } else {
               try {
                 video.pause();
@@ -112,9 +126,9 @@
         { root: null, rootMargin: "200px 0px", threshold: 0.01 }
       );
 
-      homeVideos.forEach(function (video) {
-        io.observe(video);
-      });
+      for (var k = 1; k < homeVideos.length; k++) {
+        io.observe(homeVideos[k]);
+      }
     }
 
     function armGestureReplay() {
@@ -142,6 +156,9 @@
     mq.addEventListener("change", function () {
       applyVideoSources();
       playVideos();
+      if (homeVideos.length) {
+        playHomeVideo(homeVideos[0]);
+      }
     });
 
     document.addEventListener("visibilitychange", function () {
@@ -150,8 +167,8 @@
   }
 
   function init() {
-    revealCards();
     initProjectVideos();
+    revealCards();
   }
 
   if (document.readyState === "loading") {

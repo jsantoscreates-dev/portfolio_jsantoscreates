@@ -195,9 +195,8 @@ ul {
   padding: 24px 0 48px;
 }
 
-/* Entrada editorial — stagger por project-card */
+/* Entrada editorial — stagger por project-card (só transform; vídeos ficam visíveis para autoplay) */
 .content .project-card {
-  opacity: 0;
   transform: translateY(18px);
 }
 
@@ -212,12 +211,10 @@ ul {
 
 @keyframes card-enter {
   from {
-    opacity: 0;
     transform: translateY(18px);
   }
 
   to {
-    opacity: 1;
     transform: translateY(0);
   }
 }
