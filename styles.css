@@ -196,62 +196,76 @@ ul {
 }
 
 /* ============================================
-   Project reveal system
-   Fade + subtle scale — settling into presence
+   Page reveal system
+   Pure CSS animations on page load.
+   Uses animation-fill-mode: backwards for
+   graceful degradation (no JS required).
+
+   Two distinct animations:
+   - mediaReveal: fade + scale + translateY (visuals only)
+   - textReveal: fade only (text elements)
    ============================================ */
 
-.project-card {
-  --media-duration: 1300ms;
-  --media-easing: cubic-bezier(0.25, 1, 0.5, 1);
-  --scale-easing: cubic-bezier(0.33, 1, 0.68, 1);
-
-  display: block;
+@keyframes mediaReveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-/* Media container — fade, scale, and subtle clip */
+@keyframes textReveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Sidebar text — enters first */
+.sidebar {
+  animation: textReveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: 0s;
+}
+
+/* Media container — fade + scale + translateY */
 .project-card__media {
   position: relative;
   background-color: #f0f0f0;
-  opacity: 0;
-  transform: scale(0.988);
-  clip-path: inset(0 0 2% 0);
-  will-change: opacity, transform, clip-path;
-  transition:
-    opacity var(--media-duration) var(--media-easing),
-    transform var(--media-duration) var(--scale-easing),
-    clip-path var(--media-duration) var(--media-easing);
+  animation: mediaReveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
-.project-card.is-visible .project-card__media {
-  opacity: 1;
-  transform: scale(1);
-  clip-path: inset(0 0 0 0);
+/* Cascade delays for media — 0.12s stagger */
+.project-card:nth-child(1) .project-card__media { animation-delay: 0.12s; }
+.project-card:nth-child(2) .project-card__media { animation-delay: 0.24s; }
+.project-card:nth-child(3) .project-card__media { animation-delay: 0.36s; }
+.project-card:nth-child(4) .project-card__media { animation-delay: 0.48s; }
+
+/* Project text (details) — fade only, synced with media */
+.project-card__details {
+  animation: textReveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
-/* Video — softer fade, slight delay, develops into view */
+.project-card:nth-child(1) .project-card__details { animation-delay: 0.12s; }
+.project-card:nth-child(2) .project-card__details { animation-delay: 0.24s; }
+.project-card:nth-child(3) .project-card__details { animation-delay: 0.36s; }
+.project-card:nth-child(4) .project-card__details { animation-delay: 0.48s; }
+
+/* Video background for seamless fade */
 .project-card__media video {
   background-color: #f0f0f0;
-  opacity: 0;
-  transition: opacity 1600ms cubic-bezier(0.35, 1, 0.6, 1) 180ms;
 }
 
-.project-card.is-visible .project-card__media video {
-  opacity: 1;
-}
-
-/* Reduced motion: instant visibility, no animation */
+/* Reduced motion: disable all reveal animations */
 @media (prefers-reduced-motion: reduce) {
-  .project-card__media {
-    opacity: 1;
-    transform: none;
-    clip-path: none;
-    transition: none;
-    will-change: auto;
-  }
-
-  .project-card__media video {
-    opacity: 1;
-    transition: none;
+  .sidebar,
+  .project-card__media,
+  .project-card__details {
+    animation: none;
   }
 }
 
