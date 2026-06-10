@@ -1,121 +1,213 @@
 (function () {
-  function revealCards() {
-    var content = document.querySelector(".content");
-    if (!content || !content.querySelector(".project-card")) return;
+  'use strict';
 
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      content.classList.add("cards-animate");
+  // Timing constants — slow, editorial rhythm
+  var ONSET_DELAY_MS = 60;   // Composed pause before first reveal
+  var STAGGER_MS = 150;       // Breathing room between cards
+  var REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ============================================
+  // Project card reveal system
+  // ============================================
+
+  function initProjectReveal() {
+    var cards = document.querySelectorAll('.project-card');
+    if (!cards.length) return;
+
+    // Reduced motion: show all immediately
+    if (REDUCED_MOTION) {
+      cards.forEach(function (card) {
+        card.classList.add('is-visible');
+      });
       return;
     }
 
-    requestAnimationFrame(function () {
-      content.classList.add("cards-animate");
-    });
+    var revealQueue = [];
+    var isProcessing = false;
+    var hasStarted = false;
+
+    function revealCard(card) {
+      // Double RAF ensures styles are computed before transition begins
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          card.classList.add('is-visible');
+        });
+      });
+    }
+
+    function processRevealQueue() {
+      if (isProcessing || !revealQueue.length) return;
+      isProcessing = true;
+
+      var card = revealQueue.shift();
+
+      // First card gets onset delay for composed feel
+      var delay = hasStarted ? 0 : ONSET_DELAY_MS;
+      hasStarted = true;
+
+      setTimeout(function () {
+        revealCard(card);
+
+        // Process next card after stagger interval
+        setTimeout(function () {
+          isProcessing = false;
+          processRevealQueue();
+        }, STAGGER_MS);
+      }, delay);
+    }
+
+    function queueReveal(card) {
+      if (card.classList.contains('is-visible')) return;
+      if (revealQueue.indexOf(card) !== -1) return;
+      revealQueue.push(card);
+      processRevealQueue();
+    }
+
+    // Intersection Observer for scroll-based reveal
+    if ('IntersectionObserver' in window) {
+      var observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              queueReveal(entry.target);
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        {
+          root: null,
+          rootMargin: '0px 0px -6% 0px',
+          threshold: 0.01
+        }
+      );
+
+      cards.forEach(function (card) {
+        observer.observe(card);
+      });
+    } else {
+      // Fallback: reveal all with stagger
+      setTimeout(function () {
+        cards.forEach(function (card, i) {
+          setTimeout(function () {
+            card.classList.add('is-visible');
+          }, i * STAGGER_MS);
+        });
+      }, ONSET_DELAY_MS);
+    }
   }
 
+  // ============================================
+  // Video source selection (responsive)
+  // ============================================
+
   function applyVideoSources() {
-    var mq = window.matchMedia("(max-width: 767px)");
+    var isMobile = window.matchMedia('(max-width: 767px)').matches;
     var videos = document.querySelectorAll(
-      ".project-card__media video, .case-hero__media video, .case-section__media video"
+      '.project-card__media video, .case-hero__media video, .case-section__media video'
     );
 
     videos.forEach(function (video) {
-      var sources = video.querySelectorAll("source");
+      var sources = video.querySelectorAll('source');
       if (sources.length < 2) return;
 
-      var target = mq.matches ? sources[0] : sources[sources.length - 1];
-      var nextSrc = target.getAttribute("src");
-      if (!nextSrc || video.getAttribute("src") === nextSrc) return;
+      var target = isMobile ? sources[0] : sources[sources.length - 1];
+      var nextSrc = target.getAttribute('src');
+      if (!nextSrc || video.getAttribute('src') === nextSrc) return;
 
       video.src = nextSrc;
       video.load();
     });
   }
 
+  // ============================================
+  // Video playback and readiness
+  // ============================================
+
   function initProjectVideos() {
-    var homeVideos = document.querySelectorAll(".project-card__media video");
-    var caseVideos = document.querySelectorAll(".case-hero__media video, .case-section__media video");
+    var homeVideos = document.querySelectorAll('.project-card__media video');
+    var caseVideos = document.querySelectorAll('.case-hero__media video, .case-section__media video');
+
     if (!homeVideos.length && !caseVideos.length) return;
 
     applyVideoSources();
 
-    var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    var mq = window.matchMedia("(max-width: 767px)");
+    var mq = window.matchMedia('(max-width: 767px)');
     var gestureArmed = false;
 
     function prepareVideo(video) {
-      // Alguns browsers (ex.: Brave/Chromium) exigem estas flags como propriedades
-      // para permitir autoplay (mesmo que existam como atributos no HTML).
       video.muted = true;
       video.defaultMuted = true;
       video.playsInline = true;
       video.autoplay = true;
-      video.setAttribute("muted", "");
-      video.setAttribute("playsinline", "");
-      video.setAttribute("autoplay", "");
+      video.setAttribute('muted', '');
+      video.setAttribute('playsinline', '');
+      video.setAttribute('autoplay', '');
     }
 
-    function playVideos() {
-      if (reduceMotion) {
-        homeVideos.forEach(function (video) {
-          video.pause();
-          video.removeAttribute("autoplay");
-        });
+    function playVideo(video) {
+      prepareVideo(video);
+      video.play().catch(function () {
+        // Autoplay blocked — poster remains visible
+      });
+    }
+
+    function playAllCaseVideos() {
+      if (REDUCED_MOTION) {
         caseVideos.forEach(function (video) {
           video.pause();
-          video.removeAttribute("autoplay");
+          video.removeAttribute('autoplay');
         });
         return;
       }
 
-      // Case study: tocar logo (só 1-2 vídeos)
       caseVideos.forEach(function (video) {
-        prepareVideo(video);
-        video.play().catch(function () {
-          /* autoplay bloqueado — o poster fica visível */
-        });
+        playVideo(video);
       });
     }
 
-    function playHomeVideo(video) {
-      prepareVideo(video);
-      video.play().catch(function () {});
-    }
-
-    function initHomeLazyPlayback() {
+    function initHomeVideos() {
       if (!homeVideos.length) return;
+
+      if (REDUCED_MOTION) {
+        homeVideos.forEach(function (video) {
+          video.pause();
+          video.removeAttribute('autoplay');
+        });
+        return;
+      }
 
       var firstVideo = homeVideos[0];
 
-      // 1º vídeo: play logo ao abrir (não esperar animação nem scroll)
-      playHomeVideo(firstVideo);
+      // First video: play immediately
+      playVideo(firstVideo);
 
-      // Restantes: lazy-play para não competir com o primeiro no load
+      // Remaining videos: lazy play via IntersectionObserver
+      if (homeVideos.length === 1) return;
+
+      // Prepare but pause remaining videos
       for (var i = 1; i < homeVideos.length; i++) {
+        prepareVideo(homeVideos[i]);
         try {
           homeVideos[i].pause();
         } catch (e) {}
-        prepareVideo(homeVideos[i]);
       }
 
-      if (homeVideos.length === 1) return;
-
-      // Fallback simples se não houver IntersectionObserver
-      if (!("IntersectionObserver" in window)) {
+      if (!('IntersectionObserver' in window)) {
+        // Fallback: play all
         for (var j = 1; j < homeVideos.length; j++) {
-          playHomeVideo(homeVideos[j]);
+          playVideo(homeVideos[j]);
         }
         return;
       }
 
-      var io = new IntersectionObserver(
+      var videoObserver = new IntersectionObserver(
         function (entries) {
           entries.forEach(function (entry) {
             var video = entry.target;
             if (video === firstVideo) return;
 
             if (entry.isIntersecting) {
-              playHomeVideo(video);
+              playVideo(video);
             } else {
               try {
                 video.pause();
@@ -123,11 +215,11 @@
             }
           });
         },
-        { root: null, rootMargin: "200px 0px", threshold: 0.01 }
+        { root: null, rootMargin: '200px 0px', threshold: 0.01 }
       );
 
       for (var k = 1; k < homeVideos.length; k++) {
-        io.observe(homeVideos[k]);
+        videoObserver.observe(homeVideos[k]);
       }
     }
 
@@ -136,43 +228,48 @@
       gestureArmed = true;
 
       function onFirstGesture() {
-        playVideos();
-        // Gesto do utilizador também ajuda a arrancar os vídeos da home
+        playAllCaseVideos();
         homeVideos.forEach(function (video) {
           video.play().catch(function () {});
         });
       }
 
-      window.addEventListener("click", onFirstGesture, { passive: true, once: true });
-      window.addEventListener("touchstart", onFirstGesture, { passive: true, once: true });
-      window.addEventListener("keydown", onFirstGesture, { once: true });
-      window.addEventListener("scroll", onFirstGesture, { passive: true, once: true });
+      window.addEventListener('click', onFirstGesture, { passive: true, once: true });
+      window.addEventListener('touchstart', onFirstGesture, { passive: true, once: true });
+      window.addEventListener('keydown', onFirstGesture, { once: true });
+      window.addEventListener('scroll', onFirstGesture, { passive: true, once: true });
     }
 
-    playVideos();
-    initHomeLazyPlayback();
+    playAllCaseVideos();
+    initHomeVideos();
     armGestureReplay();
 
-    mq.addEventListener("change", function () {
+    mq.addEventListener('change', function () {
       applyVideoSources();
-      playVideos();
+      playAllCaseVideos();
       if (homeVideos.length) {
-        playHomeVideo(homeVideos[0]);
+        playVideo(homeVideos[0]);
       }
     });
 
-    document.addEventListener("visibilitychange", function () {
-      if (!document.hidden) playVideos();
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) {
+        playAllCaseVideos();
+      }
     });
   }
 
+  // ============================================
+  // Init
+  // ============================================
+
   function init() {
     initProjectVideos();
-    revealCards();
+    initProjectReveal();
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }

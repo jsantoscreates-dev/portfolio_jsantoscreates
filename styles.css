@@ -195,35 +195,63 @@ ul {
   padding: 24px 0 48px;
 }
 
-/* Entrada editorial — stagger por project-card (só transform; vídeos ficam visíveis para autoplay) */
-.content .project-card {
-  transform: translateY(18px);
+/* ============================================
+   Project reveal system
+   Fade + subtle scale — settling into presence
+   ============================================ */
+
+.project-card {
+  --media-duration: 1300ms;
+  --media-easing: cubic-bezier(0.25, 1, 0.5, 1);
+  --scale-easing: cubic-bezier(0.33, 1, 0.68, 1);
+
+  display: block;
 }
 
-.content.cards-animate .project-card {
-  animation: card-enter 850ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+/* Media container — fade, scale, and subtle clip */
+.project-card__media {
+  position: relative;
+  background-color: #f0f0f0;
+  opacity: 0;
+  transform: scale(0.988);
+  clip-path: inset(0 0 2% 0);
+  will-change: opacity, transform, clip-path;
+  transition:
+    opacity var(--media-duration) var(--media-easing),
+    transform var(--media-duration) var(--scale-easing),
+    clip-path var(--media-duration) var(--media-easing);
 }
 
-.content.cards-animate .project-card:nth-child(1) { animation-delay: 0ms; }
-.content.cards-animate .project-card:nth-child(2) { animation-delay: 150ms; }
-.content.cards-animate .project-card:nth-child(3) { animation-delay: 300ms; }
-.content.cards-animate .project-card:nth-child(4) { animation-delay: 450ms; }
-
-@keyframes card-enter {
-  from {
-    transform: translateY(18px);
-  }
-
-  to {
-    transform: translateY(0);
-  }
+.project-card.is-visible .project-card__media {
+  opacity: 1;
+  transform: scale(1);
+  clip-path: inset(0 0 0 0);
 }
 
+/* Video — softer fade, slight delay, develops into view */
+.project-card__media video {
+  background-color: #f0f0f0;
+  opacity: 0;
+  transition: opacity 1600ms cubic-bezier(0.35, 1, 0.6, 1) 180ms;
+}
+
+.project-card.is-visible .project-card__media video {
+  opacity: 1;
+}
+
+/* Reduced motion: instant visibility, no animation */
 @media (prefers-reduced-motion: reduce) {
-  .content .project-card {
+  .project-card__media {
     opacity: 1;
     transform: none;
-    animation: none !important;
+    clip-path: none;
+    transition: none;
+    will-change: auto;
+  }
+
+  .project-card__media video {
+    opacity: 1;
+    transition: none;
   }
 }
 
@@ -234,10 +262,6 @@ ul {
 /* ============================================
    Project cards (links para case studies)
    ============================================ */
-.project-card {
-  display: block;
-}
-
 .project-card__link {
   display: flex;
   flex-direction: column;
