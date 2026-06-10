@@ -176,51 +176,10 @@
         return;
       }
 
-      var firstVideo = homeVideos[0];
-
-      // First video: play immediately
-      playVideo(firstVideo);
-
-      // Remaining videos: lazy play via IntersectionObserver
-      if (homeVideos.length === 1) return;
-
-      // Prepare but pause remaining videos
-      for (var i = 1; i < homeVideos.length; i++) {
-        prepareVideo(homeVideos[i]);
-        try {
-          homeVideos[i].pause();
-        } catch (e) {}
-      }
-
-      if (!('IntersectionObserver' in window)) {
-        // Fallback: play all
-        for (var j = 1; j < homeVideos.length; j++) {
-          playVideo(homeVideos[j]);
-        }
-        return;
-      }
-
-      var videoObserver = new IntersectionObserver(
-        function (entries) {
-          entries.forEach(function (entry) {
-            var video = entry.target;
-            if (video === firstVideo) return;
-
-            if (entry.isIntersecting) {
-              playVideo(video);
-            } else {
-              try {
-                video.pause();
-              } catch (e) {}
-            }
-          });
-        },
-        { root: null, rootMargin: '200px 0px', threshold: 0.01 }
-      );
-
-      for (var k = 1; k < homeVideos.length; k++) {
-        videoObserver.observe(homeVideos[k]);
-      }
+      // Play all home videos immediately on page load
+      homeVideos.forEach(function (video) {
+        playVideo(video);
+      });
     }
 
     function armGestureReplay() {
