@@ -201,19 +201,17 @@ ul {
    Uses animation-fill-mode: backwards for
    graceful degradation (no JS required).
 
-   Two distinct animations:
-   - mediaReveal: fade + scale + translateY (visuals only)
+   Two animations:
+   - mediaReveal: fade only (videos appear immediately)
    - textReveal: fade only (text elements)
    ============================================ */
 
 @keyframes mediaReveal {
   from {
     opacity: 0;
-    transform: translateY(8px) scale(0.96);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
   }
 }
 
